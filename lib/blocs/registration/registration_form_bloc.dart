@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
+import 'package:web_notify/redux/actions/auth_actions.dart';
 
 abstract class FormEvent {}
 
@@ -9,16 +10,22 @@ class FormToggle extends FormEvent {
 }
 
 class SubmitEvent extends FormEvent {
-  String name, email, password;
-  SubmitEvent({this.name, this.email, this.password});
+  Map<String, String> data = {};
+  bool type;
+  SubmitEvent(this.data, {this.type});
   String toString() {
-    return '$name $email $password';
+    return data.toString() + ' with type: $type';
   }
 }
 
 class RegistrationFormBloc {
+  final store;
   final BehaviorSubject<FormEvent> _formEventCtrl =
       BehaviorSubject<FormEvent>();
+
+  RegistrationFormBloc(this.store) {
+    print('RegistrationFormBloc: ${store.hashCode}');
+  }
   //
   //  Inputs
   //
@@ -42,6 +49,12 @@ class RegistrationFormBloc {
     } else if (event is SubmitEvent) {
       print('RegisterBloc: Submit Form event received');
       print(event);
+      // paylod is Map like {name: Aleks, email: aleksej.lobikov@gmail.com, password: qwerty} with type: true
+      // where type:true means Signin and flase - Register
+      // now we dispatching it to Redux in ccordsnce with type of authorization: signin or register
+      event.type
+          ? store.dispatch(SigninAction(event.data))
+          : store.dispatch(SignupAction(event.data));
     }
   }
 

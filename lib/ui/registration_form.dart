@@ -1,32 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:web_notify/blocs/registration/reg_populate_fields.dart';
-import 'package:web_notify/blocs/registration/registration_form_bloc.dart';
+import 'package:web_notify/redux/actions/auth_actions.dart';
+import 'package:web_notify/redux/app_state.dart';
+import 'package:web_notify/extensions/hover_extensions.dart';
 
 class RegistrationForm extends StatefulWidget {
+  final store;
+
+  RegistrationForm({Key key, @required this.store}) : super(key: key);
   @override
   _RegistrationFormState createState() => _RegistrationFormState();
 }
 
 class _RegistrationFormState extends State<RegistrationForm> {
-  RegistrationFormBloc _registrationFormBloc;
+  // RegistrationFormBloc _registrationFormBloc;
   bool isSignin = true;
   final nameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
   final confirmCtrl = TextEditingController();
   String nameError, emailError, passwordError, confirmError;
-  bool nameText = false;
-  bool emailText = false;
-  bool passwordText = false;
-  bool confirmText = false;
+  bool nameText = true;
+  bool emailText = true;
+  bool passwordText = true;
+  bool confirmText = true;
   bool passwordVisible;
 
   @override
   void initState() {
     super.initState();
     passwordVisible = false;
-    _registrationFormBloc = RegistrationFormBloc();
-    _registrationFormBloc.init();
+    // _registrationFormBloc = RegistrationFormBloc(widget.store);
+    // _registrationFormBloc.init();
 
     nameCtrl.addListener(nameFieldValidator);
     emailCtrl.addListener(emailFieldValidator);
@@ -36,7 +42,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
   @override
   void dispose() {
-    _registrationFormBloc?.dispose();
+    // _registrationFormBloc?.dispose();
     nameCtrl.dispose();
     emailCtrl.dispose();
     passwordCtrl.dispose();
@@ -49,11 +55,11 @@ class _RegistrationFormState extends State<RegistrationForm> {
     print('!!! Register Form built !!!');
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        elevation: 0.0,
-        title: Text('Notify'),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   elevation: 0.0,
+      //   title: Text('Notify'),
+      //   centerTitle: true,
+      // ),
       floatingActionButton: Transform.scale(
         scale: 0.7,
         child: FloatingActionButton(
@@ -64,129 +70,159 @@ class _RegistrationFormState extends State<RegistrationForm> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
-          child: Form(
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 30),
+        child: Center(
+          child: Container(
+            alignment: Alignment.center,
+            height: MediaQuery.of(context).size.height,
+            width: 500,
+            padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
+            child: Form(
+              child: StoreConnector<AppState, AppState>(
+                  converter: (store) => store.state,
+                  builder: (context, state) {
+                    //! ***********************************
+                    return Column(
+                      children: <Widget>[
+                        SizedBox(height: 30),
+                        Center(
+                          child: Image.asset('assets/bohnekamp.png', width: 150),
+                        ),
+                        SizedBox(height: 20),
 //! Header
-                Center(
-                  child: Text(
-                      isSignin ? 'Login to your account' : 'Create Account',
-                      style: TextStyle(fontSize: 24)),
-                ),
-                SizedBox(height: 20.0),
+                        Center(
+                          child: Text(
+                              isSignin ? 'Sign in' : 'Create your Account',
+                              style: TextStyle(fontSize: 24)),
+                        ),
+                        SizedBox(height: 20.0),
 //! Name field
-                if (!isSignin)
-                  TextField(
-                    controller: nameCtrl,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'user name',
-                      errorText: nameError,
-                    ),
-                    onChanged: null, //TODO
-                    keyboardType: TextInputType.text,
-                  ),
-                SizedBox(height: 20.0),
+                        if (!isSignin)
+                          GestureDetector(
+                            child: Container(
+                              height: 90.0,
+                              child: TextField(
+                                controller: nameCtrl,
+                                onTap: _dispatchRegFormContinue,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'user name',
+                                  errorText: nameError,
+                                ),
+                                keyboardType: TextInputType.text,
+                              ),
+                            ),
+                          ).showCursorOnHover,
 //! Email field
-                TextField(
-                  controller: emailCtrl,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'email',
-                    errorText: emailError,
-                  ),
-                  onChanged: null, //TODO
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 20.0),
-//! Password ield
-                TextField(
-                  controller: passwordCtrl,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'password',
-                    errorText: passwordError,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        // Based on passwordVisible state choose the icon
-                        passwordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                      onPressed: () {
-                        // Update the state i.e. toogle the state of passwordVisible variable
-                        setState(() {
-                          passwordVisible = !passwordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                  obscureText: passwordVisible,
-                  onChanged: null, //TODO
-                ),
-                SizedBox(height: 20.0),
+                        GestureDetector(
+                          child: Container(
+                            height: 90.0,
+                            child: TextField(
+                              controller: emailCtrl,
+                              onTap: _dispatchRegFormContinue,
+                              decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(),
+                                border: OutlineInputBorder(),
+                                labelText: 'email',
+                                errorText: emailError,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                          ),
+                        ).showCursorOnHover,
+//! Password field
+                        GestureDetector(
+                          child: Container(
+                            height: 90,
+                            child: TextField(
+                              controller: passwordCtrl,
+                              onTap: _dispatchRegFormContinue,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'password',
+                                errorText: passwordError,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    // Based on passwordVisible state choose the icon
+                                    passwordVisible
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                  onPressed: () {
+                                    // Update the state i.e. toogle the state of passwordVisible variable
+                                    setState(() {
+                                      passwordVisible = !passwordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                              obscureText: !passwordVisible,
+                            ),
+                          ),
+                        ).showCursorOnHover,
 //! Pasword Confrim field
-                if (!isSignin)
-                  TextField(
-                    controller: confirmCtrl,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'retype password',
-                      errorText: confirmError,
-                    ),
-                    obscureText: passwordVisible,
-                    onChanged: null, //TODO
-                  ),
-                SizedBox(height: 20.0),
+                        if (!isSignin)
+                          GestureDetector(
+                            child: Container(
+                              height: 90,
+                              child: TextField(
+                                controller: confirmCtrl,
+                                onTap: _dispatchRegFormContinue,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'retype password',
+                                  errorText: confirmError,
+                                ),
+                                obscureText: passwordVisible,
+                              ),
+                            ),
+                          ).showCursorOnHover,
+//! Error Message or Linear Progress Indicator
+                        _loadingOrErrorIndicator(state),
+
+                        SizedBox(height: 5.0),
 //! Raised Button
-                RaisedButton(
-                  elevation: 0,
-                  color: Colors.redAccent,
-                  child: Text(isSignin ? 'Log In' : 'Register',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w400)),
-                  onPressed:
-                      (nameText && emailText && passwordText && confirmText)
-                          ? () {
-                              // launch the registration process
-                              _registrationFormBloc.inFormEvent.add(SubmitEvent(
-                                  name: nameCtrl.text,
-                                  email: emailCtrl.text,
-                                  password: passwordCtrl.text));
-                            }
-                          : null, // button stays disabled in view
-                ),
-                SizedBox(height: 4.0),
-                InkWell(
-                    child: Text('Forgot password?',
-                        style: TextStyle(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline)),
-                    onTap: () {
-                      print('done');
-                    }),
-                SizedBox(height: 4.0),
-                InkWell(
-                    onTap: () {
-                      setState(() {
-                        isSignin = !isSignin;
-                      });
-                    },
-                    child: isSignin
-                        ? Text("Don't have an account? Sing up.",
-                            style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline))
-                        : Text("Already have account? Login.",
-                            style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline))),
-              ],
+                        Container(
+                          width: 500,
+                          height: 50,
+                          child: RaisedButton(
+                            elevation: 0,
+                            color:
+                                isSignin ? Colors.blueAccent : Colors.redAccent,
+                            child: Text(isSignin ? 'Sign in' : 'Register',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400)),
+                            onPressed: (nameText &&
+                                    emailText &&
+                                    passwordText &&
+                                    confirmText)
+                                ? () {
+                                    // launch the registration process
+                                    var data = {
+                                      'name': nameCtrl.text,
+                                      'email': emailCtrl.text,
+                                      'password': passwordCtrl.text
+                                    };
+                                    isSignin
+                                        ? widget.store
+                                            .dispatch(SigninAction(data))
+                                        : widget.store
+                                            .dispatch(SignupAction(data));
+                                  }
+                                : null, // button stays disabled in view
+                          ),
+                        ),
+                        SizedBox(height: 9.0),
+                        //! Hyperlink Text fields
+                        isSignin ? adviceOnSignin() : adviceOnSignup()
+
+                        // ],
+                        // ),
+                      ],
+                    );
+                  }),
             ),
           ),
         ),
@@ -194,15 +230,67 @@ class _RegistrationFormState extends State<RegistrationForm> {
     );
   }
 
+  Widget adviceOnSignup() {
+    return GestureDetector(
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            isSignin = !isSignin;
+            StoreProvider.of<AppState>(context).dispatch(
+                RegFormContinue()); // chnage app state just to clear error message
+          });
+        },
+        child: Text(
+          "Have an account? Login.",
+          style: TextStyle(color: Colors.blue),
+        ),
+      ),
+    ).showCursorOnHover;
+  }
+
+  Widget adviceOnSignin() {
+    return Row(
+      children: <Widget>[
+        GestureDetector(
+          child: InkWell(
+              child: Text(
+                'Reset password?',
+                style: TextStyle(color: Colors.blue),
+              ),
+              onTap: () {
+                print('done');
+              }),
+        ).showCursorOnHover,
+        Spacer(),
+        GestureDetector(
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                isSignin = !isSignin;
+                StoreProvider.of<AppState>(context).dispatch(
+                    RegFormContinue()); // chnage app state just to clear error message
+              });
+            },
+            child: Text(
+              "Create Account",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+        ).showCursorOnHover,
+      ],
+    );
+  }
+
   void nameFieldValidator() {
-    if (nameCtrl.text.length < 3 && nameCtrl.text.length >= 1)
+    if (nameCtrl.text.length < 3 && nameCtrl.text.length >= 1) {
       setState(() {
         nameError = 'min 3 chars';
         nameText = false;
       });
-    //! extra check for case when populating fields to clear form
-    else if (nameCtrl.text.length != 0) {
+      //! extra check for case when populating fields to clear form
+    } else {
       setState(() {
+        print('Name validator true');
         nameError = null;
         nameText = true;
         print('nametext set to true: ${nameCtrl.text}');
@@ -218,24 +306,26 @@ class _RegistrationFormState extends State<RegistrationForm> {
           emailError = 'not valid email';
           emailText = false;
         });
-      } else {
+      } else
         setState(() {
+          print('Email validator true');
           emailError = null;
           emailText = true;
         });
-      }
     }
   }
 
   void passwordFieldValidator() {
     if (passwordCtrl.text.length != 0) {
-      if (passwordCtrl.text.length < 6 && passwordCtrl.text.length >= 1)
+      if (passwordCtrl.text.length < 6 && passwordCtrl.text.length >= 1) {
         setState(() {
+          print('Password validator false');
           passwordError = 'min 6 chars';
           passwordText = false;
         });
-      else
+      } else
         setState(() {
+          print('Password validator true');
           passwordError = null;
           passwordText = true;
         });
@@ -245,13 +335,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
   void confirmFieldValidator() {
     if (confirmCtrl.text.length != 0) {
       if (confirmCtrl.text.length >= 1 &&
-          (passwordCtrl.text != confirmCtrl.text))
+          (passwordCtrl.text != confirmCtrl.text)) {
         setState(() {
           confirmError = "doesn't match";
           confirmText = false;
         });
-      else
+      } else
         setState(() {
+          print('Confirm validator true');
           confirmError = null;
           confirmText = true;
         });
@@ -271,6 +362,42 @@ class _RegistrationFormState extends State<RegistrationForm> {
       emailCtrl.text = form.email;
       passwordCtrl.text = form.password;
       confirmCtrl.text = form.confirmPassword;
+      _dispatchRegFormContinue();
     });
+  }
+
+  /// chanage app state just to clear error message
+  void _dispatchRegFormContinue() {
+    var store = StoreProvider.of<AppState>(context);
+    if (store.state is RegFormStateErrorMessage)
+      store.dispatch(RegFormContinue());
+  }
+
+  Widget _loadingOrErrorIndicator(state) {
+    if (state is RegFormStateLocalLoading)
+      return Container(
+          alignment: Alignment.center,
+          height: 20.0,
+          child: LinearProgressIndicator());
+    else if (state is RegFormStateErrorMessage)
+      return Container(
+          alignment: Alignment.topCenter,
+          height: 20.0,
+          child: Text(state.errorMessage, style: TextStyle(color: Colors.red)));
+    else
+      return Container(height: 20.0);
+  }
+}
+
+class TestField extends StatelessWidget {
+  const TestField(this.text, {Key key}) : super(key: key);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    print('%%%%%%%%%%%% TestField rebuilt %%%%%%%%%%%%');
+    return Center(
+      child: Text(text),
+    );
   }
 }
