@@ -1,71 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+
+import 'package:web_notify/src/redux/store.dart';
 import 'redux/actions/auth_actions.dart';
-import 'redux/app_state.dart';
-import 'redux/middleware/log_middleware.dart';
-import 'redux/middleware/parse_middleware.dart';
-import 'redux/reducer.dart';
+import 'src/redux/auth/auth_actions.dart';
+import 'src/redux/auth/auth_state.dart';
 import 'ui/home/home.dart';
+import 'debug/home1.dart';
 import 'ui/loading.dart';
 import 'ui/registration_form.dart';
 
 const String CURRENT_RELEASE = '0.0.1';
 const String CURRENT_BUILD = 'Flutter for Web';
 
-void main() {
-  final store = Store<AppState>(appReducer,
-      initialState: AppStateLoading(),
-      middleware: [LogMiddleware(), ParseMiddleware()]);
-  print('Main ${store.hashCode}');
-  runApp(MyApp(store));
+void main() async {
+  print('Main()');
+  await Redux.init();
+  print('ready to launch MyApp');
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final store;
-
-  const MyApp(this.store);
-
   // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      child: MyMaterialApp(store),
-      store: store,
+    return MaterialApp(
+      title: 'Notify',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: StoreProvider<AppState>(
+        child: HomePage(),
+        store: Redux.store,
+      ),
     );
   }
 }
 
-class MyMaterialApp extends StatelessWidget {
-  final Widget child;
-  final store;
-  const MyMaterialApp(this.store, {Key key, this.child}) : super(key: key);
-
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    store.dispatch(Initialize());
-    return StoreConnector<AppState, AppState>(
-        converter: (store) => store.state,
-        ignoreChange: (state) => state is LocalViewChangeState,
+    Redux.store.dispatch(Initialize()); // action for MIDDLEWARE
+    return Scaffold(
+      body: StoreConnector<AppState, AuthState>(
+        distinct: true,
+        converter: (store) => store.state.authState,
         builder: (BuildContext context, state) {
-          return MaterialApp(
-            home: Scaffold(
-              body: _buildVisible(state),
-            ),
-          );
-        });
+          return _buildVisible(state);
+        },
+      ),
+    );
   }
 
-  Widget _buildVisible(AppState state) {
-    if (state is AppStateLoading)
+  Widget _buildVisible(AuthState state) {
+    if (state.isLoading) {
       return LoadingView();
-    else if (state is AppStateAuthorized)
-      return Home(state.user);
-    else if (state is AppStateUnAuthorized)
-      // return Home1();
-      // return Home(IamUser()); //todo HomeScreen testing
-      return RegistrationForm(store: store);
-
-    throw ArgumentError('Main/_buidVisible(): No view for state: $state');
+    } else if (state.authUser == null) {
+      return RegistrationForm();
+    } else if (state.authUser != null) {
+      return Home1();
+    }
+    throw ArgumentError('Main/_buidVisible(): No view for Auth state change');
   }
 }

@@ -24,3 +24,30 @@ class IamUser {
     return 'IamUser(): $username $email $password $deviceId $objectId';
   }
 }
+
+class AuthUser {
+  String username;
+  String email;
+  String password;
+  String objectId;
+  String deviceId;
+
+  AuthUser.fromJson(json) {
+    username = json['username'];
+    email = json['email'];
+    password = json['password'];
+  }
+
+  void fromJson(data) {
+    username = data['name'];
+    email = data['email'];
+    password = data['password'];
+    // objectId ??= data['objectId'];
+    // deviceId ??= data['deviceId'];
+  }
+
+  @override
+  String toString() {
+    return 'AuthUser(): $username $email $password $deviceId $objectId';
+  }
+}

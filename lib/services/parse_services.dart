@@ -8,12 +8,6 @@ import 'package:web_notify/constants/key.dart' as keys;
 
 
 class ParseServices {
-  // static const String PARSE_APP_ID = 'iCYTGvNAatQe64smIVqoOidyKKoPx4N0qq3zdH2o';
-  // static const String PARSE_APP_URL = "https://notifyme.back4app.io";
-  // //?? the old one used and working somehow ?? 'https://parseapi.back4app.com';
-  // static const String MASTER_KEY = 'lTkaAkYe0jKDFfFEpdWZmgs8jqQwBqwlQyDjKPBS';
-  // static const String LIVE_QUERY_URL = 'wss://notifyme.back4app.io';
-  // static const String CLIENT_KEY = '7nsbXEBwo8vRCpdr5Xua2SdnQ1k41M3tg8VHX0SR';
 
   Parse parseInstance;
 
@@ -126,20 +120,20 @@ class ParseServices {
   }
 
   /// Checks state of current user in Back4App
-  /// returns bool
-  //TODO however user info from server recieved too and may be I need to use it
-  Future<bool> isLogged() async {
+  /// 
+  /// returns null or AuthUser
+  Future<AuthUser> isLogged() async {
     var user = await ParseUser.currentUser();
     // Update current user from server - Best done to verify user is still a valid user
     var response = await ParseUser.getCurrentUserFromServer();
     // user?.get<String>(keyHeaderSessionToken)); //? newer lib parameters
     if (response?.success ?? false) {
       user = response.result;
-      print('isLogged: ${user['username']}');
-      return true;
+      print('isLogged(): ${user['username']}');
+      return AuthUser.fromJson(user);
     }
-    print('user not logged');
-    return false;
+    print('isLogged(): user not logged');
+    return null;
   }
 
   /// creates record of this.user in Users on b4a

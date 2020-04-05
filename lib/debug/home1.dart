@@ -19,3 +19,14 @@ class Home1 extends StatelessWidget {
     );
   }
 }
+
+class RegistrationForm1 extends StatelessWidget {
+  const RegistrationForm1({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(child: Text('This is registration form')),
+    );
+  }
+}

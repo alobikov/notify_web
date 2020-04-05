@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:web_notify/redux/actions/auth_actions.dart';
+import 'package:web_notify/redux/app_state.dart';
 
 class AddressList extends StatefulWidget {
   const AddressList({Key key}) : super(key: key);
@@ -8,8 +11,10 @@ class AddressList extends StatefulWidget {
 }
 
 class _AddressListState extends State<AddressList> {
+  
   @override
   Widget build(BuildContext context) {
+    final store = StoreProvider.of<AppState>(context);
     return Container(
       // color: Colors.blue[100],
       child: ListView.separated(
@@ -21,7 +26,7 @@ class _AddressListState extends State<AddressList> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                print('taped');
+                store.dispatch(SetComposeState(adresatas: 'Mario-${index.toString()}'));
               },
               borderRadius: BorderRadius.all(Radius.circular(10)),
               hoverColor: Colors.white,

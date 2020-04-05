@@ -11,9 +11,9 @@ class SignupAction {
   Map<String, String> data;
   SignupAction(this.data);
 }
+
 class SignoutAction {}
 
-class Initialize {}
 
 class Authorized {}
 
@@ -48,10 +48,17 @@ class LocalLoading {}
 
 class RegFormContinue {}
 
-class SetComposeAdresatas {
-  final adresatas;
+class ComposeHome {}
 
-  SetComposeAdresatas(this.adresatas);
+class SetComposeState {
+  String adresatas;
+  String message;
+
+  SetComposeState({this.adresatas, this.message});
 }
 
+class ComposeValidateMessageAction {
+  final String msg;
 
+  ComposeValidateMessageAction(this.msg);
+}

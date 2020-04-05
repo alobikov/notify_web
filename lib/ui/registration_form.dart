@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:web_notify/blocs/registration/reg_populate_fields.dart';
-import 'package:web_notify/redux/actions/auth_actions.dart';
-import 'package:web_notify/redux/app_state.dart';
 import 'package:web_notify/extensions/hover_extensions.dart';
+import 'package:web_notify/src/redux/auth/auth_actions.dart';
+import 'package:web_notify/src/redux/auth/auth_state.dart';
+import 'package:web_notify/src/redux/store.dart';
 
 class RegistrationForm extends StatefulWidget {
-  final store;
+  // final store;
 
-  RegistrationForm({Key key, @required this.store}) : super(key: key);
+  // RegistrationForm({Key key, @required this.store}) : super(key: key);
   @override
   _RegistrationFormState createState() => _RegistrationFormState();
 }
@@ -31,8 +32,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
   void initState() {
     super.initState();
     passwordVisible = false;
-    // _registrationFormBloc = RegistrationFormBloc(widget.store);
-    // _registrationFormBloc.init();
 
     nameCtrl.addListener(nameFieldValidator);
     emailCtrl.addListener(emailFieldValidator);
@@ -77,15 +76,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
             width: 500,
             padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
             child: Form(
-              child: StoreConnector<AppState, AppState>(
-                  converter: (store) => store.state,
-                  builder: (context, state) {
+              child: StoreConnector<AppState, AuthState>(
+                  converter: (store) => store.state.authState,
+                  builder: (context, authState) {
                     //! ***********************************
                     return Column(
                       children: <Widget>[
                         SizedBox(height: 30),
                         Center(
-                          child: Image.asset('assets/bohnekamp.png', width: 150),
+                          child:
+                              Image.asset('assets/bohnekamp.png', width: 150),
                         ),
                         SizedBox(height: 20),
 //! Header
@@ -178,7 +178,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                             ),
                           ).showCursorOnHover,
 //! Error Message or Linear Progress Indicator
-                        _loadingOrErrorIndicator(state),
+                        _loadingOrErrorIndicator(authState),
 
                         SizedBox(height: 5.0),
 //! Raised Button
@@ -200,16 +200,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
                                     confirmText)
                                 ? () {
                                     // launch the registration process
-                                    var data = {
-                                      'name': nameCtrl.text,
+                                    var json = {
+                                      'username': nameCtrl.text,
                                       'email': emailCtrl.text,
                                       'password': passwordCtrl.text
                                     };
                                     isSignin
-                                        ? widget.store
-                                            .dispatch(SigninAction(data))
-                                        : widget.store
-                                            .dispatch(SignupAction(data));
+                                        ? Redux.store
+                                            .dispatch(SigninAction.fromJson(json))
+                                        : Redux.store
+                                            .dispatch(SignupAction.fromJson(json));
                                   }
                                 : null, // button stays disabled in view
                           ),
@@ -236,8 +236,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
         onTap: () {
           setState(() {
             isSignin = !isSignin;
-            StoreProvider.of<AppState>(context).dispatch(
-                RegFormContinue()); // chnage app state just to clear error message
+            Redux.store.dispatch(
+                SetAuthStateAction()); // TODO chnage app state just to clear error message
           });
         },
         child: Text(
@@ -267,8 +267,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
             onTap: () {
               setState(() {
                 isSignin = !isSignin;
-                StoreProvider.of<AppState>(context).dispatch(
-                    RegFormContinue()); // chnage app state just to clear error message
+                Redux.store.dispatch(
+                    SetAuthStateAction()); // chnage app state just to clear error message
               });
             },
             child: Text(
@@ -368,22 +368,22 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
   /// chanage app state just to clear error message
   void _dispatchRegFormContinue() {
-    var store = StoreProvider.of<AppState>(context);
-    if (store.state is RegFormStateErrorMessage)
-      store.dispatch(RegFormContinue());
+    var store = Redux.store;
+    if (store.state.authState.errorMsg != null)
+      store.dispatch(SetAuthStateAction(authState: AuthState(errorMsg: null)));
   }
 
-  Widget _loadingOrErrorIndicator(state) {
-    if (state is RegFormStateLocalLoading)
+  Widget _loadingOrErrorIndicator(AuthState state) {
+    if (state.isLoading)
       return Container(
           alignment: Alignment.center,
           height: 20.0,
           child: LinearProgressIndicator());
-    else if (state is RegFormStateErrorMessage)
+    else if (state.errorMsg != null)
       return Container(
           alignment: Alignment.topCenter,
           height: 20.0,
-          child: Text(state.errorMessage, style: TextStyle(color: Colors.red)));
+          child: Text(state.errorMsg, style: TextStyle(color: Colors.red)));
     else
       return Container(height: 20.0);
   }

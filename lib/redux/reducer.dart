@@ -2,7 +2,7 @@ import 'package:web_notify/models/user.dart';
 import 'package:web_notify/redux/actions/auth_actions.dart';
 import 'package:web_notify/redux/app_state.dart';
 
-AppState appReducer(AppState state, action) {
+AppState appReducer(state, action) {
   final IamUser _user = IamUser(); //TODO maybe not needed here
   if (action is SigninAction) {
     // currently does nothing - all job done in middleware
@@ -26,10 +26,16 @@ AppState appReducer(AppState state, action) {
     return RegFormStateErrorMessage(action.message);
   } else if (action is RegFormContinue) {
     return RegFormStateContinue();
-  } else if (action is SetComposeAdresatas) {
-    return HomeScreenComposeState('Aleksej');
+  } else if (action is ComposeHome) { 
+    return HomeScreenComposeState(adresatas: '');
+  } else if (action is SetComposeState) {
+    print('Reducer adresatas: ${action.adresatas}');
+    print('Reducer state adresatas: ${state.adresatas}');
+    print('Reducer action message: ${action.message}');
+    // return HomeScreenComposeState(adresatas: action.adresatas ?? state.adresatas, message: action.message ?? state.message);
+    return HomeScreenComposeState(adresatas: 'd', message: 'e');
   }
 
-  print(' =========== NOT handled in appReducer $action ===========');
+  print(' =========== NOT handled in appReducer $action ==========*');
   return state;
 }

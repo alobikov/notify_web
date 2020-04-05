@@ -1,6 +1,6 @@
 import 'package:redux/redux.dart';
+import 'package:web_notify/src/redux/store.dart';
 
-import '../app_state.dart';
 
 class LogMiddleware implements MiddlewareClass<AppState> {
   @override

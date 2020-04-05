@@ -8,7 +8,7 @@
 .buildlog/
 .history
 .svn/
-constants/
+constants/keys.dart
 
 # IntelliJ related
 *.iml

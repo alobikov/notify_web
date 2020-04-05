@@ -18,8 +18,7 @@ import 'package:web_notify/models/user.dart';
 //   }
 // }
 
-abstract class AppState {
-}
+abstract class AppState {}
 
 // LocalVireChangeState stops build by StoreConnector in MyMaterialApp
 class LocalViewChangeState {}
@@ -47,6 +46,10 @@ class RegFormStateContinue with LocalViewChangeState implements AppState {}
 // ! Home screen states
 
 class HomeScreenComposeState with LocalViewChangeState implements AppState {
-  final String adresatas;
-  HomeScreenComposeState(this.adresatas);
+  String adresatas;
+  String message;
+  HomeScreenComposeState({adresatas, message}) {
+    this.adresatas = adresatas;
+    this.message = message;
+  }
 }
