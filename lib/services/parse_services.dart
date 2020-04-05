@@ -8,12 +8,6 @@ import 'web_notify/constants/key.dart' as keys;
 
 
 class ParseServices {
-  // static const String PARSE_APP_ID = 'iCYTGvNAatQe64smIVqoOidyKKoPx4N0qq3zdH2o';
-  // static const String PARSE_APP_URL = "https://notifyme.back4app.io";
-  // //?? the old one used and working somehow ?? 'https://parseapi.back4app.com';
-  // static const String MASTER_KEY = 'lTkaAkYe0jKDFfFEpdWZmgs8jqQwBqwlQyDjKPBS';
-  // static const String LIVE_QUERY_URL = 'wss://notifyme.back4app.io';
-  // static const String CLIENT_KEY = '7nsbXEBwo8vRCpdr5Xua2SdnQ1k41M3tg8VHX0SR';
 
   Parse parseInstance;
 
