@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:web_notify/ui/drawer.dart';
-import 'msg_pan.dart';
-import 'address_list.dart';
-import 'compose.dart';
+import 'package:web_notify/ui/home/address_list.dart';
+import 'package:web_notify/ui/home/compose.dart';
+import 'package:web_notify/ui/home/msg_pan.dart';
+
 
 class Home extends StatelessWidget {
   final user;

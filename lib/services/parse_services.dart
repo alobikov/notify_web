@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 import 'package:web_notify/models/user.dart';
-import 'web_notify/constants/key.dart' as keys;
+import 'package:web_notify/constants/key.dart' as keys;
 
 
 class ParseServices {
