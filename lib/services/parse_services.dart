@@ -47,18 +47,7 @@ class ParseServices {
   }
 
   loginTest() async {
-    var api =
-        "https://notifyme.back4app.io/login?username=aleksej.lobikov%40gmail.com&password=qwerty";
-    var res = await http.get(
-      api,
-      headers: {
-        "accept": "application/json",
-        "X-Parse-Application-Id": "iCYTGvNAatQe64smIVqoOidyKKoPx4N0qq3zdH2o",
-        "X-Parse-REST-API-Key": "xQXI9GRGAOEi8t8392dm64YMw8U5SFjKaILcG7FU",
-        "X-Parse-Revocable-Session": "1"
-      },
-    );
-    print(res.body);
+
   }
 
   /// returns null if success or error message
